@@ -4,16 +4,15 @@ import random
 
 
 def player_marker_input():
-    global player1
-    global player2
+    marker = ''
 
-    while player1 != 'X' and player1 != 'O':
-        player1 = input('Player 1, pick X or O:')
+    while not (marker == 'X' or marker == 'O'):
+        marker = input('Player 1, pick X or O:').upper()
 
-    if player1 == 'X':
-        player2 = 'O'
+    if marker == 'X':
+        return 'X', 'O'
     else:
-        player2 = 'X'
+        return 'O', 'X'
 
 
 def display_board():
@@ -27,17 +26,20 @@ def display_board():
 
 
 def player_input():
+    position = 0
     global last_chance
+
     if last_chance == player2:
         player = player1
         last_chance = player1
     else:
         player = player2
         last_chance = player2
-    position = int(input(f'{player}, your turn. Enter your position from 1 to 9: '))
 
-    if board[position] == ' ':
-        place_marker(player, position)
+    while position not in range(1, 10) or board[position] != ' ':
+        position = int(input(f'{player}, your turn. Enter your position from 1 to 9: '))
+
+    place_marker(player, position)
 
 
 def place_marker(marker, position):
@@ -63,6 +65,11 @@ def win_check():
         elif condition <= player2_positions:
             print('Player 2 won! Congratulations')
             return True
+
+    if full_board_check():
+        print("It's a tie!")
+        return True
+
     return False
 
 
@@ -94,10 +101,8 @@ def choose_first_player():
 
 while True:
     last_chance = ''
-    player1 = ''
-    player2 = ''
     board = [' '] * 10
-    player_marker_input()
+    player1, player2 = player_marker_input()
     choose_first_player()
     while not full_board_check() and not win_check():
         player_input()
