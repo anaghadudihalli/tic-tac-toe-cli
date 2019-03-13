@@ -1,9 +1,11 @@
 import os
 import sys
+import random
 
 
 def player_marker_input():
-    player1 = ''
+    global player1
+    global player2
 
     while player1 != 'X' and player1 != 'O':
         player1 = input('Player 1, pick X or O:')
@@ -12,8 +14,6 @@ def player_marker_input():
         player2 = 'O'
     else:
         player2 = 'X'
-
-    return player1, player2
 
 
 def display_board():
@@ -26,13 +26,18 @@ def display_board():
     print(board[1] + ' | ' + board[2] + ' | ' + board[3])
 
 
-def player_input(player):
-    while True:
-        position = int(input('{player}, your turn. Enter your position from 1 to 9: '))
+def player_input():
+    global last_chance
+    if last_chance == player2:
+        player = player1
+        last_chance = player1
+    else:
+        player = player2
+        last_chance = player2
+    position = int(input(f'{player}, your turn. Enter your position from 1 to 9: '))
 
-        if board[position] == ' ':
-            place_marker(player, position)
-            break
+    if board[position] == ' ':
+        place_marker(player, position)
 
 
 def place_marker(marker, position):
@@ -53,12 +58,48 @@ def win_check():
 
     for condition in win_conditions:
         if condition <= player1_positions:
-            print('player 1 won')
+            print('Player 1 won! Congratulations')
+            return True
         elif condition <= player2_positions:
-            print('player 2 won')
+            print('Player 2 won! Congratulations')
+            return True
+    return False
 
 
-board = [' '] * 10
-player1, player2 = player_marker_input()
-player_input()
+def full_board_check():
+    for position in board:
+        if position == ' ':
+            return False
+    return True
 
+
+def replay():
+    replay_game = ''
+    while replay_game.lower() not in 'yn':
+        replay_game = input('Do you want to play again? Y or N:')
+
+    return replay_game.lower() == 'y'
+
+
+def choose_first_player():
+    global last_chance
+    chosen_integer = random.randint(1, 2)
+    if chosen_integer == 1:
+        print('Player 1 goes first')
+        last_chance = player2
+    else:
+        print('Player 2 goes first')
+        last_chance = player1
+
+
+while True:
+    last_chance = ''
+    player1 = ''
+    player2 = ''
+    board = [' '] * 10
+    player_marker_input()
+    choose_first_player()
+    while not full_board_check() and not win_check():
+        player_input()
+    if not replay():
+        break
